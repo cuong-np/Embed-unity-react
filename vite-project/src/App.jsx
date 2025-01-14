@@ -1,11 +1,9 @@
 import './App.css'
-import React, { Fragment } from "react";
+import React, { Fragment, useState, useCallback, useEffect } from "react";
 import { Unity, useUnityContext } from "react-unity-webgl";
 
 function App() {
-  // const [isGameOver, setIsGameOver] = useState(false);
-  // const [userName, setUserName] = useState();
-  // const [score, setScore] = useState();
+   const [keyPress, setKeyPess] = useState();
 
   const { unityProvider, sendMessage, addEventListener, removeEventListener } =
     useUnityContext({
@@ -15,20 +13,18 @@ function App() {
       codeUrl: "build/build.wasm",
     });
 
-  // const handleGameOver = useCallback((userName, score) => {
-  //   setIsGameOver(true);
-  //   setUserName(userName);
-  //   setScore(score);
-  // }, []);
+  const handleKeyPress = useCallback((keyCode) => {
+    setKeyPess(keyCode);
+  }, []);
 
-  // useEffect(() => {
-  //   addEventListener("GameOver", handleGameOver);
-  //   return () => {
-  //     removeEventListener("GameOver", handleGameOver);
-  //   };
-  // }, [addEventListener, removeEventListener, handleGameOver]);
+  useEffect(() => {
+    addEventListener("KeyPress", handleKeyPress);
+    return () => {
+      removeEventListener("KeyPress", handleKeyPress);
+    };
+  }, [addEventListener, removeEventListener, handleKeyPress]);
 
-  function handleClickSpawnEnemies() {
+  function handleClickRandomKey() {
     sendMessage("KeyBoard", "OnRandomKey");
   }
 
@@ -42,11 +38,13 @@ function App() {
           border: "2px solid #000", 
         }}
       />
-      <button onClick={handleClickSpawnEnemies}>Random key</button>
-      {/* {isGameOver === true && (
-        <p>{`Game Over ${userName}! You've scored ${score} points.`}</p>
-      )} */}
-      
+      <button onClick={handleClickRandomKey}>Random key</button>    
+      <div style={{ marginTop: "20px", textAlign: "center" }}>
+        <h2>Last Key Pressed:</h2>
+        <p style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>
+          {keyPress ? keyPress : "No key pressed yet"}
+        </p>
+      </div>
     </Fragment>
   );
 }
